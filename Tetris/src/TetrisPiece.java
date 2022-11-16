@@ -1,5 +1,3 @@
-import java.util.Iterator;
-
 public class TetrisPiece {
 	Color color;
 	int[][] form;
@@ -46,11 +44,12 @@ public class TetrisPiece {
 			form=constructTetrisZ;
 			this.color=new Color("Pink",127,0,127);
 			break;
-			
-		}
-		//System.out.println(toString());
-		//rotateleft();
-		//System.out.println(toString());
+		default:
+			int[][] constructTetrisZ2={{1,1,0},{0,1,1}};
+			form=constructTetrisZ2;
+			this.color=new Color("Pink",127,0,127);
+			break;
+		}			
 	}
 	
 	public int[][] getform(){
@@ -62,19 +61,21 @@ public class TetrisPiece {
 	}
 	
 	public void rotateleft() {
+		
 		int[][] rotated=new int[form[0].length][form.length];
 		
 		for(int i=0;i<form.length;i++) {
-			for(int j=0;j<form[i].length;j++) {
-				rotated[j][i]=form[i][j];
+			for(int j=form[i].length-1;j>=0;j--) {
+				rotated[j][i]=form[i][form[i].length-1-j];
 			}
-		}
-		
+		}		
 		form=rotated;
 	}
 	
 	public void rotateright() {
-		
+		rotateleft();
+		rotateleft();
+		rotateleft();
 	}
 	
 	@Override
@@ -90,11 +91,5 @@ public class TetrisPiece {
 		
 
 		return s;
-	}
-	
-	public static void main(String[] args) {
-		//test rotate left
-		new TetrisPiece(2);
-		
 	}
 }
