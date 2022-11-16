@@ -1,5 +1,8 @@
 
+import java.awt.event.KeyEvent;
+
 import ledControl.*;
+import ledControl.gui.KeyBuffer;
 
 
 public class MainTetris {
@@ -7,6 +10,8 @@ public class MainTetris {
 	public BoardController c = BoardController.getBoardController(LedConfiguration.LED_20x20_EMULATOR);
 	public int[][][] colors;
 	int currentx,currenty,offset;
+	TetrisPiece currentPiece;
+	char lastchar='p';
 	
 	//Color presets
 	public Color Blue=new Color("Blue", 0, 0, 127); 
@@ -69,7 +74,6 @@ public class MainTetris {
 	public void setColors() {
 		c.setColors(colors);
 		c.updateBoard();
-		
 	}
 	
 	public void move() {
@@ -95,48 +99,36 @@ public class MainTetris {
 	
 	
 	public void spawnTetrisStein(TetrisPiece t) {
+		currentPiece=t;
 		refreshColors();
 		currentx=6;
 		currenty=0;
-		int i,j=0;
-		for(i=0; i<t.getlength()&&!willcollide(t);i++) {
-			for(j=0;j<t.getform()[i].length&&!willcollide(t);j++) {
-				if(t.getform()[i][j]==1) {
-					setMyColorArray(currentx+j, currenty+i, t.getColor());
-				}
-			}			
-			setColors();
-		}
-		currenty+=i-1;
-		currentx+=j-1;
 		
-		while(!willcollide(t)) {
-			deletepattern(t);
+		while(!willcollide("down")) {
+			c.sleep(200);
+			createNewPattern(Black);
 			currenty++;
-			createNewPattern(t,t.getColor());
+			if(c.getKeyBuffer().eventsInBuffer()!=0) {
+				keypressManager();
+				c.setColors(colors);
+			}
+			createNewPattern(t.getColor());
 		}
 		
-		createNewPattern(t, White);
+		createNewPattern(White);
 		currentx=6;
 		currenty=0;
 	}
 	
-	public void deletepattern(TetrisPiece t) {
-		for(int i=0; i<t.getlength();i++) {
-			for(int j=0;j<t.getform()[t.getform().length-i-1].length;j++) {
-				if(t.getform()[t.getform().length-i-1][t.getform()[i].length-j-1]==1) {
-					setMyColorArray(currentx-j, currenty-i, Black);
-				}
-			}
-			
-		}
-		setColors();
-	}
-	
-	public void createNewPattern(TetrisPiece t,Color Farbe) {
-		for(int i=0; i<t.getlength();i++) {
-			for(int j=0;j<t.getform()[t.getform().length-i-1].length;j++) {
-				if(t.getform()[t.getform().length-i-1][t.getform()[i].length-j-1]==1) {
+	public void createNewPattern(Color Farbe) {
+		for(int i=0; i<currentPiece.getform().length;i++) {
+			if(currenty-i<0)
+				return;
+			for(int j=0;j<currentPiece.getform()[currentPiece.getform().length-i-1].length;j++) {
+				if(currentx-j<0)
+					return;
+				
+				if(currentPiece.getform()[currentPiece.getform().length-i-1][currentPiece.getform()[i].length-j-1]==1) {
 					setMyColorArray(currentx-j, currenty-i, Farbe);
 				}
 			}
@@ -144,31 +136,93 @@ public class MainTetris {
 		}
 		setColors();
 	}
+
 	
-	
-	
-	
-	public boolean willcollide(TetrisPiece t) {
-		for(int i=0; i<t.getlength();i++) {
+	public boolean willcollide(String action) {
+		for(int i=0; i<currentPiece.getform().length;i++) {
 			
 			if(currenty-i+1==-1)
 				return false;
 			
-			for(int j=0;j<t.getform()[t.getform().length-i-1].length;j++) {
-				if(t.getform()[t.getform().length-i-1][t.getform()[i].length-j-1]==1) {
-					if(colors[currentx-j][currenty-i+1][0]==127&&colors[currentx-j][currenty-i+1][1]==127&&colors[currentx-j][currenty-i+1][2]==127) {
-						return true;
+			for(int j=0;j<currentPiece.getform()[currentPiece.getform().length-i-1].length;j++) {
+				if(currentPiece.getform()[currentPiece.getform().length-i-1][currentPiece.getform()[i].length-j-1]==1) {
+					
+					switch (action) {
+					case "down":
+						
+						if(isColor(currentx-j,currenty-i+1,White))
+							return true;
+				
+						break;
+					case "left":
+						
+						if(isColor(currentx-j-1,currenty-i,White))
+							return true;
+						
+						break;
+					case "right":
+						
+						if(isColor(currentx-j+1,currenty-i,White))
+							return true;
+						
+						break;	
 					}
 				}
 			}
+		}	
+		return false;
+	}
+
+	public boolean isColor(int x, int y, Color color) {
+		
+			if(x<0||y<0)
+				return false;
 			
-		}
+			if(colors[x][y][0]==color.getRed()&&colors[x][y][1]==color.getGreen()&&colors[x][y][0]==color.getBlue()) 
+				return true;
 		
 		return false;
 	}
 	
+	public void keypressManager() {
+		KeyBuffer buffer=c.getKeyBuffer();
+		
+		KeyEvent event=buffer.pop();
+		while(buffer.eventsInBuffer()!=0) {
+			event=buffer.pop();
+		}
+		
+		//System.out.println(event.getKeyChar());
+		switch (event.getKeyChar()) {
+		case 'q':	//rotate left
+			
+			break;
+		case 'e':	//rotate right
+			
+			break;
+		case 'a':	//left
+			if(!willcollide("left")){
+				currentx-=1;
+			}
+			break;
+		case 's':	//down
+			if(!willcollide("down")){
+				currenty+=1;
+			}
+			break;
+		case 'd':	//right
+			if(!willcollide("right")){
+				currentx+=1;
+			}
+			break;
+		case 'w':	// toggle store next piece
+			
+			break;
+		}
+		
+	}
 
-
+	
 
 	/**
 	 * Main-Methode

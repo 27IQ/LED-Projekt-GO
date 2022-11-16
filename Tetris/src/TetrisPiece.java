@@ -1,16 +1,14 @@
+import java.util.Iterator;
 
 public class TetrisPiece {
 	Color color;
 	int[][] form;
-	int length;
-	
-	
+		
 	/**
 	 * Konstruktor für einen Tetrisstein
 	 * @param id je nach id wird eine andere form zugewiesen
 	 */
 	public TetrisPiece(int id) {
-		this.color=color;
 		
 		switch (id) {
 		case 1:
@@ -50,7 +48,9 @@ public class TetrisPiece {
 			break;
 			
 		}
- 		this.length=form.length;
+		//System.out.println(toString());
+		//rotateleft();
+		//System.out.println(toString());
 	}
 	
 	public int[][] getform(){
@@ -61,17 +61,40 @@ public class TetrisPiece {
 		return color;
 	}
 	
-	public int getlength() {
-		return length;
+	public void rotateleft() {
+		int[][] rotated=new int[form[0].length][form.length];
+		
+		for(int i=0;i<form.length;i++) {
+			for(int j=0;j<form[i].length;j++) {
+				rotated[j][i]=form[i][j];
+			}
+		}
+		
+		form=rotated;
 	}
 	
+	public void rotateright() {
+		
+	}
 	
-	/**
-	 * Methode zum Prüfen ob der Spielstein schon komplett dargestellt wurde.
-	 * @param currentlength
-	 * @return true wenn komplett dargestellt
-	 */
-	public boolean fullydisplayed(int currentlength) {
-		return length-currentlength==0;
+	@Override
+	public String toString() {
+		String s="";
+		
+		for (int[] is : form) {
+			for (int i : is) {
+				s+=Integer.toString(i)+" ";
+			}
+			s+="\n";
+		}
+		
+
+		return s;
+	}
+	
+	public static void main(String[] args) {
+		//test rotate left
+		new TetrisPiece(2);
+		
 	}
 }
