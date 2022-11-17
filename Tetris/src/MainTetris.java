@@ -10,7 +10,7 @@ public class MainTetris {
 	
 	public BoardController c = BoardController.getBoardController(LedConfiguration.LED_20x20_EMULATOR);
 	public int[][][] colors;
-	int currentx,currenty;
+	int currentx,currenty,offset;
 	TetrisPiece currentPiece;
 	boolean lost=false;
 	int counter1=0,counter2=0,counter3=0,counter4=0,counter5=0,counter6=0;
@@ -117,45 +117,69 @@ public class MainTetris {
 		
 		while(!willcollide("down")) {
 			c.sleep(300);
-			createNewPattern(Black);
+			createPattern(Black);
 			currenty++;
 			if(c.getKeyBuffer().eventsInBuffer()!=0) {
 				keypressManager(c.getKeyBuffer());
 				c.setColors(colors);
 			}
-			createNewPattern(t.getColor());
+			createPattern(t.getColor());
 		}
 		
-		createNewPattern(White);
+		createPattern(White);
 		checkRows();
 	}
 	
-	public boolean[] checkRows() {
+	public void checkRows() {
+		
 		boolean[] rowclear=new boolean[19];
-		for(int i=1;i<12;i++) {
-			for(int j=0;j<19;j++) {
+		for(int j=0;j<19;j++) {
+			rowclear[j]=true;
+			for(int i=1;i<12;i++) {
 
 				if(isColor(i, j, White)&&j==0) {
 					endGame();
 					setMyColorArray(i, j, Red);
 				}	
 				
+				if(isColor(i, j,Black)) {
+					rowclear[j]=false;
+				}
 				
 			}
+			
+			//System.out.println(rowclear.length+""+rowclear[j]);
+	
+	}
+		//concat rows
+		
+		offset=0;
+		
+		for(int i=19;i>1;i--) {
+			if(rowclear[i-1]) {
+				offset++;
+				continue;
+			}
+			
+			for(int j=1;j<12;j++) {
+				if(isColor(j, i, White)) {
+					setMyColorArray(j, i+offset, White);
+				}else {
+					setMyColorArray(j, i+offset, Black);
+				}
+			}
 		}
-		return rowclear;
-		
+		setColors();
 	}
 	
-	public void concatRows() {
-		
-	}
-	
-	public void createNewPattern(Color Farbe) {
+	public void createPattern(Color Farbe) {
 		for(int i=0; i<currentPiece.getform().length;i++) {
+			
 			if(currenty-i<0)
 				return;
+			
 			for(int j=0;j<currentPiece.getform()[currentPiece.getform().length-i-1].length;j++) {
+				
 				if(currentx-j<0)
 					return;
 				
@@ -163,7 +187,6 @@ public class MainTetris {
 					setMyColorArray(currentx-j, currenty-i, Farbe);
 				}
 			}
-			
 		}
 		setColors();
 	}
@@ -269,7 +292,9 @@ public class MainTetris {
 			
 			break;
 		case 'd':	//right
+			
 			counter5++;
+			
 			if(counter5==2) {
 				counter5=0;
 				return;
@@ -292,7 +317,8 @@ public class MainTetris {
 	}
 
 	public void endGame() {
-		System.out.println("du hast verloren");
+		if(!lost)
+			System.out.println("du hast verloren");
 		lost=true;
 	}
 
