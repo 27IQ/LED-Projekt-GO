@@ -1,4 +1,5 @@
 
+import javax.swing.JOptionPane;
 import java.awt.event.KeyEvent;
 
 
@@ -9,7 +10,7 @@ import ledControl.gui.KeyBuffer;
 public class MainTetris {
 	
 	public BoardController c = BoardController.getBoardController(LedConfiguration.LED_20x20_EMULATOR);
-	public int[][][] colors=c.getColors();;
+	public int[][][] colors;
 	int currentx,currenty,offset,rowsCleared=0;
 	TetrisPiece currentPiece,nextPiece1,nextPiece2,nextPiece3,heldPiece;
 	boolean lost=false;
@@ -42,9 +43,15 @@ public class MainTetris {
 	 * Konstruktor für das Spiel
 	 */
 	public MainTetris() {
-		getNewColors();
+		start();
+	}
+	public void start() {
+		c.resetColors();
+		colors=c.getColors();
 		generateBorder();
+		rowsCleared=0;
 		
+		heldPiece=null;
 		currentPiece=generiereStein();
 		nextPiece1=generiereStein();
 		nextPiece2=generiereStein();
@@ -78,10 +85,6 @@ public class MainTetris {
 	    return (int) ((Math.random() * (max - min)) + min);
 	}
 	
-	public int[][][] getNewColors() {
-		colors=c.getColors();
-		return colors;
-	}
 	
 	public void setColors() {
 		c.setColors(colors);
@@ -177,6 +180,7 @@ public class MainTetris {
 		for(int i=19;i>1;i--) {
 			if(rowclear[i-1]) {
 				offset++;
+				rowsCleared++;
 				cleared=false;
 				continue;		
 			}
@@ -363,10 +367,19 @@ public class MainTetris {
 	}
 	
 	public void endGame() {
-		if(!lost)
-			System.out.println("du hast verloren");
+		if(!lost) {
+			setColors();
+			int s=JOptionPane.showConfirmDialog(null, "Lines Cleared "+rowsCleared+"\n Restart?","Du hast verloren!", JOptionPane.YES_NO_OPTION);;
+			if(s==JOptionPane.YES_OPTION) {
+				start();
+			}else {
+				System.exit(0);
+			}
+		}
+		
 		lost=true;
 	}
+	
 
 	/**
 	 * Main-Methode
