@@ -9,9 +9,9 @@ import ledControl.gui.KeyBuffer;
 public class MainTetris {
 	
 	public BoardController c = BoardController.getBoardController(LedConfiguration.LED_20x20_EMULATOR);
-	public int[][][] colors;
-	int currentx,currenty,offset;
-	TetrisPiece currentPiece;
+	public int[][][] colors=c.getColors();;
+	int currentx,currenty,offset,rowsCleared=0;
+	TetrisPiece currentPiece,nextPiece1,nextPiece2,nextPiece3,heldPiece;
 	boolean lost=false;
 	int counter1=0,counter2=0,counter3=0,counter4=0,counter5=0,counter6=0;
 	
@@ -26,18 +26,6 @@ public class MainTetris {
 	public Color White=new Color("White",127,127,127);
 	public Color Black=new Color("Black",0,0,0);
 	
-
-	/**
-	 * Adaption des Farbsystems um die Presets nutzen zu können. Setzt den Farbwert direkt in das Array des Controllers.
-	 * @param x : X-Koordinate
-	 * @param y : Y-Koordinate
-	 * @param color : Objekt Color das die drei Farbwerte übergibt
-	 */
-	public void setMyColor(int x,int y,Color color) {
-		c.setColor(x, y, color.getRed(), color.getGreen(), color.getBlue());
-	}
-	
-	
 	/**
 	 * Adaption des Farbsystems um die Presets nutzen zu können. Setzt den Farbwert in das Array "colors" das später dem Controller übergeben werden kann.
 	 * @param x : X-Koordinate
@@ -50,8 +38,6 @@ public class MainTetris {
 		colors[x][y][2]=color.getBlue();
 	}
 	
-	
-	
 	/**
 	 * Konstruktor für das Spiel
 	 */
@@ -59,10 +45,29 @@ public class MainTetris {
 		getNewColors();
 		generateBorder();
 		
+		currentPiece=generiereStein();
+		nextPiece1=generiereStein();
+		nextPiece2=generiereStein();
+		nextPiece3=generiereStein();
+		
 		while(!lost) {
-			spawnTetrisStein(generiereStein());
+			spawnTetrisStein();
+			currentPiece=nextPiece1;
+			nextPiece1=nextPiece2;
+			nextPiece2=nextPiece3;
+			nextPiece3=generiereStein();
+			
 		}
 		setColors();
+	}
+	
+	public void displaynextPieces(){
+		createPattern(17,3,nextPiece1.getColor(),nextPiece1);
+		createPattern(17,8,nextPiece2.getColor(),nextPiece2);
+		createPattern(17,13,nextPiece3.getColor(),nextPiece3);
+		
+		if(heldPiece!=null)
+		createPattern(17, 19, heldPiece.getColor(), heldPiece);
 	}
 	
 	public TetrisPiece generiereStein() {
@@ -76,10 +81,6 @@ public class MainTetris {
 	public int[][][] getNewColors() {
 		colors=c.getColors();
 		return colors;
-	}
-	
-	public void refreshColors() {
-		colors=c.getColors();
 	}
 	
 	public void setColors() {
@@ -109,28 +110,48 @@ public class MainTetris {
 	}
 	
 	
-	public void spawnTetrisStein(TetrisPiece t) {
-		currentPiece=t;
-		refreshColors();
+	public void spawnTetrisStein() {
+		displaynextPieces();
+		//currentPiece=t;
+		//refreshColors();
 		currentx=6;
 		currenty=0;
 		
 		while(!willcollide("down")) {
 			c.sleep(300);
-			createPattern(Black);
+			createPattern(currentx,currenty,Black,currentPiece);
 			currenty++;
 			if(c.getKeyBuffer().eventsInBuffer()!=0) {
 				keypressManager(c.getKeyBuffer());
+				
+				if(currentPiece==null)
+					return;
+				
 				c.setColors(colors);
 			}
-			createPattern(t.getColor());
+			createPattern(currentx,currenty,currentPiece.getColor(),currentPiece);
 		}
 		
-		createPattern(White);
+		createPattern(currentx,currenty,White,currentPiece);
+		clearnextdisplay();
 		checkRows();
+		setColors();
+	}
+	
+	
+	public void clearnextdisplay() {
+		createPattern(17,3,Black,nextPiece1);
+		createPattern(17,8,Black,nextPiece2);
+		createPattern(17,13,Black,nextPiece3);
+		
+		if(heldPiece!=null)
+		createPattern(17, 19, Black, heldPiece);
 	}
 	
 	public void checkRows() {
+		
+		@SuppressWarnings("unused")
+		boolean cleared=true;
 		
 		boolean[] rowclear=new boolean[19];
 		for(int j=0;j<19;j++) {
@@ -147,8 +168,6 @@ public class MainTetris {
 				}
 				
 			}
-			
-			//System.out.println(rowclear.length+""+rowclear[j]);
 	
 	}
 		//concat rows
@@ -158,7 +177,8 @@ public class MainTetris {
 		for(int i=19;i>1;i--) {
 			if(rowclear[i-1]) {
 				offset++;
-				continue;
+				cleared=false;
+				continue;		
 			}
 			
 			for(int j=1;j<12;j++) {
@@ -169,25 +189,28 @@ public class MainTetris {
 				}
 			}
 		}
-		setColors();
+		if(cleared=false)
+		checkRows();
 	}
 	
-	public void createPattern(Color Farbe) {
-		for(int i=0; i<currentPiece.getform().length;i++) {
+	public void createPattern(int x,int y,Color Farbe,TetrisPiece Piece) {
+		for(int i=0; i<Piece.getform().length;i++) {
 			
-			if(currenty-i<0)
+			if(y-i<0)
 				return;
 			
-			for(int j=0;j<currentPiece.getform()[currentPiece.getform().length-i-1].length;j++) {
+			for(int j=0;j<Piece.getform()[Piece.getform().length-i-1].length;j++) {
 				
-				if(currentx-j<0)
+				if(x-j<0)
 					return;
 				
-				if(currentPiece.getform()[currentPiece.getform().length-i-1][currentPiece.getform()[i].length-j-1]==1) {
-					setMyColorArray(currentx-j, currenty-i, Farbe);
+				if(Piece.getform()[Piece.getform().length-i-1][Piece.getform()[i].length-j-1]==1) {
+					setMyColorArray(x-j, y-i, Farbe);
 				}
 			}
 		}
+		
+		if(Farbe!=Black)
 		setColors();
 	}
 
@@ -217,6 +240,12 @@ public class MainTetris {
 					case "right":
 						
 						if(isColor(currentx-j+1,currenty-i,White))
+							return true;
+						
+						break;	
+					case "inner":
+						
+						if(isColor(currentx-j,currenty-i,White))
 							return true;
 						
 						break;	
@@ -258,7 +287,7 @@ public class MainTetris {
 				return;
 			}
 			currentPiece.rotateleft();
-			if(willcollide("down"))
+			if(willcollide("down")||willcollide("inner"))
 				currentPiece.rotateright();
 			break;
 		case 'e':	//rotate right
@@ -268,7 +297,7 @@ public class MainTetris {
 				return;
 			}
 			currentPiece.rotateright();
-			if(willcollide("down"))
+			if(willcollide("down")||willcollide("inner"))
 				currentPiece.rotateleft();
 			break;
 		case 'a':	//left
@@ -304,18 +333,35 @@ public class MainTetris {
 		
 			break;
 			
-		case 'w':	// toggle store next piece
+		case 'w':	// hold
 			counter6++;
 			if(counter6==2) {
 				counter6=0;
 				return;
 			}
+			setholding();
 			
 			break;
 		}
 		
 	}
 
+	public void setholding() {
+		if(heldPiece==null) {
+			heldPiece=currentPiece;
+			currentPiece=null;
+			clearnextdisplay();
+		}else {
+			clearnextdisplay();
+			TetrisPiece t=heldPiece;
+			heldPiece=currentPiece;
+			currentPiece=t;
+			currentx=6;
+			currenty=0;
+			displaynextPieces();
+		}
+	}
+	
 	public void endGame() {
 		if(!lost)
 			System.out.println("du hast verloren");
