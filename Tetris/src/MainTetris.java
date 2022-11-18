@@ -45,6 +45,11 @@ public class MainTetris {
 	public MainTetris() {
 		start();
 	}
+	
+	public void Testconcat() {
+		generateBorder();
+		
+	}
 	public void start() {
 		c.resetColors();
 		colors=c.getColors();
@@ -177,8 +182,8 @@ public class MainTetris {
 		
 		offset=0;
 		
-		for(int i=19;i>1;i--) {
-			if(rowclear[i-1]) {
+		for(int i=18;i>1;i--) {
+			if(rowclear[i]) {
 				offset++;
 				rowsCleared++;
 				cleared=false;
@@ -193,8 +198,6 @@ public class MainTetris {
 				}
 			}
 		}
-		if(cleared=false)
-		checkRows();
 	}
 	
 	public void createPattern(int x,int y,Color Farbe,TetrisPiece Piece) {
