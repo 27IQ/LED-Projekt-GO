@@ -11,7 +11,7 @@ public class MainTetris {
 	
 	public BoardController c = BoardController.getBoardController(LedConfiguration.LED_20x20_EMULATOR);
 	public int[][][] colors;
-	int currentx,currenty,offset,rowsCleared=0;
+	int currentx,currenty,offset,rowsCleared,hold;
 	TetrisPiece currentPiece,nextPiece1,nextPiece2,nextPiece3,heldPiece;
 	boolean lost=false;
 	int counter1=0,counter2=0,counter3=0,counter4=0,counter5=0,counter6=0;
@@ -119,14 +119,16 @@ public class MainTetris {
 	
 	
 	public void spawnTetrisStein() {
+		hold=1;
 		displaynextPieces();
-		//currentPiece=t;
-		//refreshColors();
 		currentx=6;
 		currenty=0;
 		
 		while(!willcollide("down")) {
-			c.sleep(300);
+			
+			if(rowsCleared<30)
+			c.sleep(300-(rowsCleared*10));
+			
 			createPattern(currentx,currenty,Black,currentPiece);
 			currenty++;
 			if(c.getKeyBuffer().eventsInBuffer()!=0) {
@@ -182,7 +184,7 @@ public class MainTetris {
 		
 		offset=0;
 		
-		for(int i=18;i>1;i--) {
+		for(int i=18;i>0;i--) {
 			if(rowclear[i]) {
 				offset++;
 				rowsCleared++;
@@ -323,7 +325,7 @@ public class MainTetris {
 				counter4=0;
 				return;
 			}
-			if(!willcollide("down"))
+			while(!willcollide("down"))
 				currenty+=1;
 			
 			break;
@@ -346,6 +348,8 @@ public class MainTetris {
 				counter6=0;
 				return;
 			}
+			
+			if(hold==1)
 			setholding();
 			
 			break;
@@ -367,6 +371,8 @@ public class MainTetris {
 			currenty=0;
 			displaynextPieces();
 		}
+		
+		hold=0;
 	}
 	
 	public void endGame() {
