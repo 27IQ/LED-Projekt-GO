@@ -1,6 +1,7 @@
 public class TetrisPiece {
 	Color color;
 	int[][] form;
+	int x,y;
 
 	/**
 	 * Konstruktor für einen Tetrisstein
@@ -8,7 +9,9 @@ public class TetrisPiece {
 	 * @param id je nach id wird eine andere Form zugewiesen
 	 */
 	public TetrisPiece(int id) {
-
+		this.x=6;
+		this.y=0;
+		
 		switch (id) {
 		case 1:
 			int[][] constructTetrisI = { { 1 }, { 1 }, { 1 }, { 1 } };
@@ -60,6 +63,35 @@ public class TetrisPiece {
 	public Color getColor() {
 		return color;
 	}
+	
+	public void setx(int value) {
+		x=value;
+	}
+
+	public void addx(int value) {
+		x+=value;
+	}
+	
+	public void sety(int value) {
+		y=value;
+	}
+	
+	public void addy(int value) {
+		y+=value;
+	}
+	
+	public int getx() {
+		return x;
+	}
+
+	public int gety() {
+		return y;
+	}
+	
+	public void setxandy(int[] a) {
+		x=a[0];
+		y=a[1];
+	}
 
 	
 	/**
@@ -103,5 +135,38 @@ public class TetrisPiece {
 		}
 
 		return s;
+	}
+	
+	/**
+	 * Überträgt die Form eines TetrisPiece in das Array "colors" wobei x und y die
+	 * untere rechte Ecke darstellen. Für Werte außerhalb des Arrays "colors" wird
+	 * nichts gemacht weshalb diese Methode auch zum Einfügen der Teile am Anfang,
+	 * wo diese nur teilweise Sichtbar sind, funktioniert.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param Farbe
+	 * @param Piece
+	 */
+	public int[][][] createPattern(int[][][] colors,Color color){
+		for (int i = 0; i < form.length; i++) {
+
+			if (y - i < 0)
+				return colors;
+
+			for (int j = 0; j < form[form.length - i - 1].length; j++) {
+
+				if (x - j < 0)
+					return colors;
+
+				if (form[form.length - i - 1][form[i].length - j - 1] == 1) {
+					
+					colors[x-j][y-i][0] = color.getRed();
+					colors[x-j][y-i][1] = color.getGreen();
+					colors[x-j][y-i][2] = color.getBlue();
+				}
+			}
+		}
+		return colors;
 	}
 }

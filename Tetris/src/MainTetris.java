@@ -9,19 +9,19 @@ public class MainTetris {
 
 	public BoardController c = BoardController.getBoardController(LedConfiguration.LED_20x20_EMULATOR);
 	public int[][][] colors;
-	int currentx, currenty, offset, rowsCleared, hold;
+	int offset, rowsCleared, hold;
 	TetrisPiece currentPiece, nextPiece1, nextPiece2, nextPiece3, heldPiece;
 	boolean lost = false;
 	int counter1 = 0, counter2 = 0, counter3 = 0, counter4 = 0, counter5 = 0, counter6 = 0;
 
 	// Color presets
-	public Color Blue = new Color("Blue", 0, 0, 127);
-	public Color Yellow = new Color("Yellow", 127, 127, 0);
-	public Color Red = new Color("Red", 127, 0, 0);
-	public Color Green = new Color("Green", 0, 127, 0);
-	public Color Orange = new Color("Orange", 127, 63, 0);
-	public Color Turquoise = new Color("Turquoise", 0, 127, 127);
-	public Color Pink = new Color("Pink", 127, 0, 127);
+	//public Color Blue = new Color("Blue", 0, 0, 127);
+	//public Color Yellow = new Color("Yellow", 127, 127, 0);
+	//public Color Red = new Color("Red", 127, 0, 0);
+	//public Color Green = new Color("Green", 0, 127, 0);
+	//public Color Orange = new Color("Orange", 127, 63, 0);
+	//public Color Turquoise = new Color("Turquoise", 0, 127, 127);
+	//public Color Pink = new Color("Pink", 127, 0, 127);
 	public Color White = new Color("White", 127, 127, 127);
 	public Color Black = new Color("Black", 0, 0, 0);
 
@@ -113,12 +113,30 @@ public class MainTetris {
 	 * Setzt die Next Pieces
 	 */
 	public void displaynextPieces() {
-		createPattern(17, 3, nextPiece1.getColor(), nextPiece1);
-		createPattern(17, 8, nextPiece2.getColor(), nextPiece2);
-		createPattern(17, 13, nextPiece3.getColor(), nextPiece3);
+		nextPiece1.setx(17);
+		nextPiece1.sety(3);
+		colors=nextPiece1.createPattern(colors,nextPiece1.getColor());
+		
+		nextPiece2.setx(17);
+		nextPiece2.sety(8);
+		colors=nextPiece2.createPattern(colors,nextPiece2.getColor());
+		
+		nextPiece3.setx(17);
+		nextPiece3.sety(13);
+		colors=nextPiece3.createPattern(colors,nextPiece3.getColor());
+		
+		//createPattern(17, 3, nextPiece1.getColor(), nextPiece1);
+		//createPattern(17, 8, nextPiece2.getColor(), nextPiece2);
+		//createPattern(17, 13, nextPiece3.getColor(), nextPiece3);
 
-		if (heldPiece != null)
-			createPattern(17, 19, heldPiece.getColor(), heldPiece);
+		if (heldPiece != null) {
+			
+			heldPiece.setx(17);
+			heldPiece.sety(19);
+			colors=heldPiece.createPattern(colors,heldPiece.getColor());
+		}
+			
+			//createPattern(17, 19, heldPiece.getColor(), heldPiece);
 	}
 
 	/**
@@ -126,12 +144,21 @@ public class MainTetris {
 	 * Array colors danach dem Board zu übergeben
 	 */
 	public void clearnextdisplay() {
-		createPattern(17, 3, Black, nextPiece1);
-		createPattern(17, 8, Black, nextPiece2);
-		createPattern(17, 13, Black, nextPiece3);
+
+		colors=nextPiece1.createPattern(colors,Black);
+		
+		colors=nextPiece2.createPattern(colors,Black);
+		
+		colors=nextPiece3.createPattern(colors,Black);
+		
+		//createPattern(17, 3, nextPiece1.getColor(), nextPiece1);
+		//createPattern(17, 8, nextPiece2.getColor(), nextPiece2);
+		//createPattern(17, 13, nextPiece3.getColor(), nextPiece3);
 
 		if (heldPiece != null)
-			createPattern(17, 19, Black, heldPiece);
+			heldPiece.createPattern(colors,Black);
+			
+			//createPattern(17, 19, heldPiece.getColor(), heldPiece);
 	}
 
 	/**
@@ -148,8 +175,8 @@ public class MainTetris {
 			TetrisPiece t = heldPiece;
 			heldPiece = currentPiece;
 			currentPiece = t;
-			currentx = 6;
-			currenty = 0;
+			currentPiece.setx(6);
+			currentPiece.sety(0);
 			displaynextPieces();
 		}
 
@@ -203,8 +230,8 @@ public class MainTetris {
 
 		// set default values
 		displaynextPieces();
-		currentx = 6;
-		currenty = 0;
+		currentPiece.setx(6);
+		currentPiece.sety(0);
 
 		while (!willcollide("down")) {
 
@@ -213,8 +240,8 @@ public class MainTetris {
 				c.sleep(300 - (rowsCleared * 10)); // seitdem c.sleep im Code steht wird das Board manchmal für einen
 													// Frame weiß
 
-			createPattern(currentx, currenty, Black, currentPiece); // vanish Piece
-			currenty++; // drop down 1
+			colors=currentPiece.createPattern(colors, Black); // vanish Piece
+			currentPiece.addy(1); // drop down 1
 
 			// verarbeitet Keypresses
 			if (c.getKeyBuffer().eventsInBuffer() != 0) {
@@ -225,49 +252,20 @@ public class MainTetris {
 
 			}
 			// setzt Piece an neuer pos mit gegebenenfalls neuer Rotation
-			createPattern(currentx, currenty, currentPiece.getColor(), currentPiece);
+			colors=currentPiece.createPattern(colors, currentPiece.getColor());
 			c.setColors(colors);
 			c.updateBoard();
 		}
 
 		// lässt ein Piece welches nicht weiter bewegt werden kann Weiß werdem um von
 		// willcollide() erkannt zu werden
-		createPattern(currentx, currenty, White, currentPiece);
+		colors=currentPiece.createPattern(colors, White);
 		clearnextdisplay();
 		CheckAndConcatRows();
 		;
 	}
 
-	/**
-	 * Überträgt die Form eines TetrisPiece in das Array "colors" wobei x und y die
-	 * untere rechte Ecke darstellen. Für Werte außerhalb des Arrays "colors" wird
-	 * nichts gemacht weshalb diese Methode auch zum Einfügen der Teile am Anfang,
-	 * wo diese nur teilweise Sichtbar sind, funktioniert. Für die Farbe Schwarz
-	 * wird das Array nicht direkt an das Board übergeben um nicht unnötig
-	 * zusätzliche Frames zu generieren.
-	 * 
-	 * @param x
-	 * @param y
-	 * @param Farbe
-	 * @param Piece
-	 */
-	public void createPattern(int x, int y, Color Farbe, TetrisPiece Piece) {
-		for (int i = 0; i < Piece.getform().length; i++) {
-
-			if (y - i < 0)
-				return;
-
-			for (int j = 0; j < Piece.getform()[Piece.getform().length - i - 1].length; j++) {
-
-				if (x - j < 0)
-					return;
-
-				if (Piece.getform()[Piece.getform().length - i - 1][Piece.getform()[i].length - j - 1] == 1) {
-					setMyColorArray(x - j, y - i, Farbe);
-				}
-			}
-		}
-	}
+	
 
 	/**
 	 * Die Methode durchsucht die position von currentPiece nach weißen Pixeln
@@ -280,7 +278,7 @@ public class MainTetris {
 	public boolean willcollide(String action) {
 		for (int i = 0; i < currentPiece.getform().length; i++) {
 
-			if (currenty - i + 1 == -1)
+			if (currentPiece.gety() - i + 1 == -1)
 				return false;
 
 			for (int j = 0; j < currentPiece.getform()[currentPiece.getform().length - i - 1].length; j++) {
@@ -290,25 +288,25 @@ public class MainTetris {
 					switch (action) {
 					case "down":
 
-						if (isColor(currentx - j, currenty - i + 1, White))
+						if (isColor(currentPiece.getx() - j, currentPiece.gety() - i + 1, White))
 							return true;
 
 						break;
 					case "left":
 
-						if (isColor(currentx - j - 1, currenty - i, White))
+						if (isColor(currentPiece.getx() - j - 1, currentPiece.gety() - i, White))
 							return true;
 
 						break;
 					case "right":
 
-						if (isColor(currentx - j + 1, currenty - i, White))
+						if (isColor(currentPiece.getx() - j + 1, currentPiece.gety() - i, White))
 							return true;
 
 						break;
 					case "inner":
 
-						if (isColor(currentx - j, currenty - i, White))
+						if (isColor(currentPiece.getx() - j, currentPiece.gety() - i, White))
 							return true;
 
 						break;
@@ -335,7 +333,6 @@ public class MainTetris {
 
 				if (isColor(i, j, White) && j == 0) {
 					endGame();
-					setMyColorArray(i, j, Red);
 				}
 
 				if (isColor(i, j, Black)) {
@@ -416,7 +413,7 @@ public class MainTetris {
 				return;
 			}
 			if (!willcollide("left"))
-				currentx -= 1;
+				currentPiece.addx(-1);
 
 			break;
 		case 's': // down
@@ -426,7 +423,7 @@ public class MainTetris {
 				return;
 			}
 			while (!willcollide("down"))
-				currenty += 1;
+				currentPiece.addy(1);
 
 			break;
 		case 'd': // right
@@ -438,7 +435,7 @@ public class MainTetris {
 				return;
 			}
 			if (!willcollide("right"))
-				currentx += 1;
+				currentPiece.addx(1);
 
 			break;
 
