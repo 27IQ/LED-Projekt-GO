@@ -5,7 +5,7 @@ import java.awt.event.KeyEvent;
 import ledControl.*;
 import ledControl.gui.KeyBuffer;
 
-public class MainTetris {
+public class BotdiffMain {
 
 	public BoardController c = BoardController.getBoardController(LedConfiguration.LED_20x20_EMULATOR);
 	public int[][][] colors;
@@ -28,7 +28,7 @@ public class MainTetris {
 	/**
 	 * Konstruktor für das Spiel
 	 */
-	public MainTetris() {
+	public BotdiffMain() {
 		start();
 	}
 
@@ -460,6 +460,6 @@ public class MainTetris {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		new MainTetris();
+		new BotdiffMain();
 	}
 }
