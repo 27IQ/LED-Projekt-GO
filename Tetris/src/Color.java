@@ -4,7 +4,7 @@ public class Color {
 	String name;
 
 	/**
-	 * Konstruktor für eine Farbe
+	 * Konstruktor für eine Farbe. Werte für Farben bis max 127.
 	 * 
 	 * @param name
 	 * @param red
@@ -27,5 +27,12 @@ public class Color {
 
 	public int getBlue() {
 		return blue;
+	}
+	/**
+	 * erzeugt ein Neues Objekt Color welches die Farbe Dunkler macht bzw die LED schwacher leuchten lässt
+	 * @return Color
+	 */
+	public Color getweakColor() {
+		return new Color("weak"+name, red/2, green/2, blue/2);
 	}
 }

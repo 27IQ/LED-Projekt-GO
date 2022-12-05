@@ -1,7 +1,7 @@
 public class TetrisPiece {
 	Color color;
 	int[][] form;
-	int x,y;
+	int x, y, id;
 
 	/**
 	 * Konstruktor für einen Tetrisstein
@@ -9,9 +9,9 @@ public class TetrisPiece {
 	 * @param id je nach id wird eine andere Form zugewiesen
 	 */
 	public TetrisPiece(int id) {
-		this.x=6;
-		this.y=0;
-		
+		this.x = 6;
+		this.y = 0;
+
 		switch (id) {
 		case 1:
 			int[][] constructTetrisI = { { 1 }, { 1 }, { 1 }, { 1 } };
@@ -56,30 +56,38 @@ public class TetrisPiece {
 		}
 	}
 
+	public int getid() {
+		return this.id;
+	}
+
 	public int[][] getform() {
 		return form;
+	}
+
+	public void setform(int[][] form) {
+		this.form = form;
 	}
 
 	public Color getColor() {
 		return color;
 	}
-	
+
 	public void setx(int value) {
-		x=value;
+		x = value;
 	}
 
 	public void addx(int value) {
-		x+=value;
+		x += value;
 	}
-	
+
 	public void sety(int value) {
-		y=value;
+		y = value;
 	}
-	
+
 	public void addy(int value) {
-		y+=value;
+		y += value;
 	}
-	
+
 	public int getx() {
 		return x;
 	}
@@ -87,13 +95,12 @@ public class TetrisPiece {
 	public int gety() {
 		return y;
 	}
-	
+
 	public void setxandy(int[] a) {
-		x=a[0];
-		y=a[1];
+		x = a[0];
+		y = a[1];
 	}
 
-	
 	/**
 	 * Rotiert das Array das die Form des Pieces enhält nach links
 	 */
@@ -109,7 +116,6 @@ public class TetrisPiece {
 		form = rotated;
 	}
 
-	
 	/**
 	 * Da war man dann auch zu faul aber dreimal Links ist auch einmal Rechts nicht?
 	 */
@@ -121,6 +127,7 @@ public class TetrisPiece {
 
 	/**
 	 * toString aus Testgründen
+	 * 
 	 * @returns die aktuelle Form des Pieces
 	 */
 	@Override
@@ -136,19 +143,18 @@ public class TetrisPiece {
 
 		return s;
 	}
-	
+
 	/**
-	 * Überträgt die Form eines TetrisPiece in das Array "colors" wobei x und y die
-	 * untere rechte Ecke darstellen. Für Werte außerhalb des Arrays "colors" wird
-	 * nichts gemacht weshalb diese Methode auch zum Einfügen der Teile am Anfang,
-	 * wo diese nur teilweise Sichtbar sind, funktioniert.
+	 * Fügt die Form eines TetrisPiece in ein Array mit den aktuellen coords ein.
+	 * Für Werte außerhalb des Arrays "colors" wird nichts gemacht weshalb diese
+	 * Methode auch zum Einfügen der Teile am Anfang, wo diese nur teilweise
+	 * Sichtbar sind, funktioniert.
 	 * 
-	 * @param x
-	 * @param y
-	 * @param Farbe
-	 * @param Piece
+	 * @param colors
+	 * @param color
+	 * @return die Form eines TetrisPiece in einem Array mit den aktuellen coords
 	 */
-	public int[][][] createPattern(int[][][] colors,Color color){
+	public int[][][] createPattern(int[][][] colors, Color color) {
 		for (int i = 0; i < form.length; i++) {
 
 			if (y - i < 0)
@@ -160,10 +166,10 @@ public class TetrisPiece {
 					return colors;
 
 				if (form[form.length - i - 1][form[i].length - j - 1] == 1) {
-					
-					colors[x-j][y-i][0] = color.getRed();
-					colors[x-j][y-i][1] = color.getGreen();
-					colors[x-j][y-i][2] = color.getBlue();
+
+					colors[x - j][y - i][0] = color.getRed();
+					colors[x - j][y - i][1] = color.getGreen();
+					colors[x - j][y - i][2] = color.getBlue();
 				}
 			}
 		}
