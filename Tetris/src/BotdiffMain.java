@@ -10,21 +10,23 @@ public class BotdiffMain {
 	public BoardController c = BoardController.getBoardController(LedConfiguration.LED_20x20_EMULATOR);
 	public int[][][] colors;
 	int offset, rowsCleared, hold;
-	TetrisPiece currentPiece, nextPiece1, nextPiece2, nextPiece3, heldPiece,previewPiece;
+	TetrisPiece currentPiece, nextPiece1, nextPiece2, nextPiece3, heldPiece, previewPiece;
 	boolean lost = false;
-	int counter1 = 0, counter2 = 0, counter3 = 0, counter4 = 0, counter5 = 0, counter6 = 0; //counter for Buffer
+	int counter1 = 0, counter2 = 0, counter3 = 0, counter4 = 0, counter5 = 0, counter6 = 0; // counter for Buffer
 	int framecounter;
 
 	// Color presets
-	//public Color Blue = new Color("Blue", 0, 0, 127);
-	//public Color Yellow = new Color("Yellow", 127, 127, 0);
-	//public Color Red = new Color("Red", 127, 0, 0);
-	//public Color Green = new Color("Green", 0, 127, 0);
-	//public Color Orange = new Color("Orange", 127, 63, 0);
-	//public Color Turquoise = new Color("Turquoise", 0, 127, 127);
-	//public Color Pink = new Color("Pink", 127, 0, 127);
+	public Color Blue = new Color("Blue", 0, 0, 127);
+	public Color Yellow = new Color("Yellow", 127, 127, 0);
+	public Color Red = new Color("Red", 127, 0, 0);
+	public Color Green = new Color("Green", 0, 127, 0);
+	public Color Orange = new Color("Orange", 127, 63, 0);
+	public Color Turquoise = new Color("Turquoise", 0, 127, 127);
+	public Color Pink = new Color("Pink", 127, 0, 127);
 	public Color White = new Color("White", 127, 127, 127);
 	public Color Black = new Color("Black", 0, 0, 0);
+
+	public Color[] colorpreset = { Blue, Yellow, Red, Green, Orange, Turquoise, Pink, White, Black };
 
 	/**
 	 * Konstruktor für das Spiel
@@ -55,7 +57,7 @@ public class BotdiffMain {
 	 */
 	public boolean isColor(int x, int y, Color color) {
 
-		if (x < 0 || y < 0)
+		if (x < 0 || x > 19 || y < 0 || y > 19)
 			return false;
 
 		if (colors[x][y][0] == color.getRed() && colors[x][y][1] == color.getGreen()
@@ -63,6 +65,22 @@ public class BotdiffMain {
 			return true;
 
 		return false;
+	}
+
+	public boolean isstaticColor(int x, int y) {
+
+		if (x < 0 || x > 19 || y < 0 || y > 19)
+			return false;
+
+		for (Color color : colorpreset) {
+			if (isColor(x, y, color.getStaticColor()))
+				return true;
+		}
+		return false;
+	}
+
+	public Color getColor(int x, int y) {
+		return new Color(null, colors[x][y][0], colors[x][y][1], colors[x][y][2]);
 	}
 
 	/**
@@ -116,24 +134,22 @@ public class BotdiffMain {
 	public void displaynextPieces() {
 		nextPiece1.setx(17);
 		nextPiece1.sety(3);
-		colors=nextPiece1.createPattern(colors,nextPiece1.getColor());
-		
+		colors = nextPiece1.createPattern(colors, nextPiece1.getColor());
+
 		nextPiece2.setx(17);
 		nextPiece2.sety(8);
-		colors=nextPiece2.createPattern(colors,nextPiece2.getColor());
-		
+		colors = nextPiece2.createPattern(colors, nextPiece2.getColor());
+
 		nextPiece3.setx(17);
 		nextPiece3.sety(13);
-		colors=nextPiece3.createPattern(colors,nextPiece3.getColor());
+		colors = nextPiece3.createPattern(colors, nextPiece3.getColor());
 
 		if (heldPiece != null) {
-			
+
 			heldPiece.setx(17);
 			heldPiece.sety(19);
-			colors=heldPiece.createPattern(colors,heldPiece.getColor());
+			colors = heldPiece.createPattern(colors, heldPiece.getColor());
 		}
-			
-			//createPattern(17, 19, heldPiece.getColor(), heldPiece);
 	}
 
 	/**
@@ -142,15 +158,15 @@ public class BotdiffMain {
 	 */
 	public void clearnextdisplay() {
 
-		colors=nextPiece1.createPattern(colors,Black);
-		
-		colors=nextPiece2.createPattern(colors,Black);
-		
-		colors=nextPiece3.createPattern(colors,Black);
+		colors = nextPiece1.createPattern(colors, Black);
+
+		colors = nextPiece2.createPattern(colors, Black);
+
+		colors = nextPiece3.createPattern(colors, Black);
 
 		if (heldPiece != null)
-			heldPiece.createPattern(colors,Black);
-			
+			heldPiece.createPattern(colors, Black);
+
 	}
 
 	/**
@@ -225,19 +241,19 @@ public class BotdiffMain {
 		currentPiece.setx(6);
 		currentPiece.sety(0);
 
-		while (!willcollide("down",currentPiece)) {
-			
+		while (!willcollide("down", currentPiece)) {
+
 			framecounter++;
 
 			// für eine ansteigende Schwierigkeit je mehr Zeilen man cleart
 			if (rowsCleared < 30)
 				c.sleep(30 - (rowsCleared)); // seitdem c.sleep im Code steht wird das Board manchmal für einen
-													// Frame weiß
+												// Frame weiß
 
-			colors=currentPiece.createPattern(colors, Black); // vanish Piece
-			if(framecounter==10) {
+			colors = currentPiece.createPattern(colors, Black); // vanish Piece
+			if (framecounter == 10) {
 				currentPiece.addy(1); // drop down 1
-				framecounter=0;
+				framecounter = 0;
 			}
 
 			// verarbeitet Keypresses
@@ -249,7 +265,7 @@ public class BotdiffMain {
 
 			}
 			// setzt Piece an neuer pos mit gegebenenfalls neuer Rotation
-			colors=currentPiece.createPattern(colors, currentPiece.getColor());
+			colors = currentPiece.createPattern(colors, currentPiece.getColor());
 			showpreview();
 			c.setColors(colors);
 			c.updateBoard();
@@ -257,79 +273,81 @@ public class BotdiffMain {
 
 		// lässt ein Piece welches nicht weiter bewegt werden kann Weiß werdem um von
 		// willcollide() erkannt zu werden
-		colors=currentPiece.createPattern(colors, White);
+		colors = currentPiece.createPattern(colors, currentPiece.getColor().getStaticColor());
 		clearnextdisplay();
 		CheckAndConcatRows();
-		
-		previewPiece=null;
-		
+
+		previewPiece = null;
+
 	}
 
-	
 	/**
 	 * erstellt ein preview wo das aktuelle Piece currentPiece gerade hinfällt
 	 */
 	public void showpreview() {
-		if(previewPiece==null) {
-			previewPiece=new TetrisPiece(0);
+		if (previewPiece == null) {
+			previewPiece = new TetrisPiece(0);
 			return;
 		}
 		previewPiece.createPattern(colors, Black);
-		
-		//übernehme werte von currentPiece
+
+		// übernehme werte von currentPiece
 		previewPiece.setform(currentPiece.getform());
 		previewPiece.setx(currentPiece.getx());
 		previewPiece.sety(currentPiece.gety());
-		
-		while(!willcollide("down",previewPiece)) { //geht so lange herunter bis es collidiert
+
+		while (!willcollide("down", previewPiece)) { // geht so lange herunter bis es collidiert
 			previewPiece.addy(1);
 		}
-		
+
 		previewPiece.createPattern(colors, currentPiece.getColor().getweakColor());
-		
+
 	}
 
 	/**
-	 * Die Methode durchsucht die position von Piece nach weißen Pixeln
-	 * down-unter dem Piece left-links neben dem Piece rigth-rechts neben dem Piece
-	 * inner-die exakte position den piece
+	 * Die Methode durchsucht die position von Piece nach weißen Pixeln down-unter
+	 * dem Piece left-links neben dem Piece rigth-rechts neben dem Piece inner-die
+	 * exakte position den piece
 	 * 
 	 * @param aktion
 	 * @param Piece
 	 * @return true wenn die gewählte Aktion zu einer kollision führt
 	 */
-	public boolean willcollide(String action,TetrisPiece Piece) {
+	public boolean willcollide(String action, TetrisPiece Piece) {
 		for (int i = 0; i < Piece.getform().length; i++) {
 
-			if (Piece.gety() - i + 1 == -1) //falls das Piece nur teilweise zu sehen ist
+			if (Piece.gety() - i + 1 == -1) // falls das Piece nur teilweise zu sehen ist
 				return false;
 
 			for (int j = 0; j < Piece.getform()[Piece.getform().length - i - 1].length; j++) {
-				if (Piece.getform()[Piece.getform().length - i - 1][Piece.getform()[i].length - j
-						- 1] == 1) {
+				if (Piece.getform()[Piece.getform().length - i - 1][Piece.getform()[i].length - j - 1] == 1) {
 
 					switch (action) {
 					case "down":
 
-						if (isColor(Piece.getx() - j, Piece.gety() - i + 1, White)) 
+						if (isstaticColor(Piece.getx() - j, Piece.gety() - i + 1)
+								|| isColor(Piece.getx() - j, Piece.gety() - i + 1, White))
 							return true;
 
 						break;
 					case "left":
 
-						if (isColor(Piece.getx() - j - 1, Piece.gety() - i, White))
+						if (isstaticColor(Piece.getx() - j - 1, Piece.gety() - i)
+								|| isColor(Piece.getx() - j - 1, Piece.gety() - i, White))
 							return true;
 
 						break;
 					case "right":
 
-						if (isColor(Piece.getx() - j + 1, Piece.gety() - i, White))
+						if (isstaticColor(Piece.getx() - j + 1, Piece.gety() - i)
+								|| isColor(Piece.getx() - j + 1, Piece.gety() - i, White))
 							return true;
 
 						break;
 					case "inner":
 
-						if (isColor(Piece.getx() - j, Piece.gety() - i, White))
+						if (isstaticColor(Piece.getx() - j, Piece.gety() - i)
+								|| isColor(Piece.getx() - j, Piece.gety() - i, White))
 							return true;
 
 						break;
@@ -354,7 +372,7 @@ public class BotdiffMain {
 			rowclear[j] = true;
 			for (int i = 1; i < 12; i++) {
 
-				if (isColor(i, j, White) && j == 0) {
+				if (!isColor(i, j, Black) && j == 0) {
 					endGame();
 				}
 
@@ -377,10 +395,10 @@ public class BotdiffMain {
 			}
 
 			for (int j = 1; j < 12; j++) {
-				if (isColor(j, i, White)) {
-					setMyColorArray(j, i + offset, White);
-				} else {
+				if (isColor(j, i, Black)) {
 					setMyColorArray(j, i + offset, Black);
+				} else {
+					setMyColorArray(j, i + offset, getColor(j, i + offset));
 				}
 			}
 		}
@@ -416,7 +434,7 @@ public class BotdiffMain {
 				return;
 			}
 			currentPiece.rotateleft();
-			if (willcollide("down",currentPiece) || willcollide("inner",currentPiece))
+			if (willcollide("down", currentPiece) || willcollide("inner", currentPiece))
 				currentPiece.rotateright();
 			break;
 		case 'e': // rotate right
@@ -426,7 +444,7 @@ public class BotdiffMain {
 				return;
 			}
 			currentPiece.rotateright();
-			if (willcollide("down",currentPiece) || willcollide("inner",currentPiece))
+			if (willcollide("down", currentPiece) || willcollide("inner", currentPiece))
 				currentPiece.rotateleft();
 			break;
 		case 'a': // left
@@ -435,7 +453,7 @@ public class BotdiffMain {
 				counter3 = 0;
 				return;
 			}
-			if (!willcollide("left",currentPiece))
+			if (!willcollide("left", currentPiece))
 				currentPiece.addx(-1);
 
 			break;
@@ -445,7 +463,7 @@ public class BotdiffMain {
 				counter4 = 0;
 				return;
 			}
-			while (!willcollide("down",currentPiece))
+			while (!willcollide("down", currentPiece))
 				currentPiece.addy(1);
 
 			break;
@@ -457,7 +475,7 @@ public class BotdiffMain {
 				counter5 = 0;
 				return;
 			}
-			if (!willcollide("right",currentPiece))
+			if (!willcollide("right", currentPiece))
 				currentPiece.addx(1);
 
 			break;
