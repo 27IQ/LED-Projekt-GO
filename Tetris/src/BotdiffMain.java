@@ -7,24 +7,24 @@ import ledControl.gui.KeyBuffer;
 
 public class BotdiffMain {
 
-	public BoardController c = BoardController.getBoardController(LedConfiguration.LED_20x20_EMULATOR);
-	public int[][][] colors;
-	int offset, rowsCleared, hold;
-	TetrisPiece currentPiece, nextPiece1, nextPiece2, nextPiece3, heldPiece, previewPiece;
-	boolean lost = false;
-	int counter1 = 0, counter2 = 0, counter3 = 0, counter4 = 0, counter5 = 0, counter6 = 0; // counter for Buffer
-	int framecounter;
+	private BoardController c = BoardController.getBoardController(LedConfiguration.LED_20x20_EMULATOR);
+	private int[][][] colors;
+	private int offset, rowsCleared, hold;
+	private TetrisPiece currentPiece, nextPiece1, nextPiece2, nextPiece3, heldPiece, previewPiece;
+	private boolean lost = false;
+	private int counter1 = 0, counter2 = 0, counter3 = 0, counter4 = 0, counter5 = 0, counter6 = 0; // counter for Buffer
+	private int framecounter;
 
 	// Color presets
-	public Color Blue = new Color("Blue", 0, 0, 127);
-	public Color Yellow = new Color("Yellow", 127, 127, 0);
-	public Color Red = new Color("Red", 127, 0, 0);
-	public Color Green = new Color("Green", 0, 127, 0);
-	public Color Orange = new Color("Orange", 127, 63, 0);
-	public Color Turquoise = new Color("Turquoise", 0, 127, 127);
-	public Color Pink = new Color("Pink", 127, 0, 127);
-	public Color White = new Color("White", 127, 127, 127);
-	public Color Black = new Color("Black", 0, 0, 0);
+	private static Color Blue = new Color("Blue", 0, 0, 127);
+	private static Color Yellow = new Color("Yellow", 127, 127, 0);
+	private static Color Red = new Color("Red", 127, 0, 0);
+	private static Color Green = new Color("Green", 0, 127, 0);
+	private static Color Orange = new Color("Orange", 127, 63, 0);
+	private static Color Turquoise = new Color("Turquoise", 0, 127, 127);
+	private static Color Pink = new Color("Pink", 127, 0, 127);
+	private static Color White = new Color("White", 127, 127, 127);
+	private static Color Black = new Color("Black", 0, 0, 0);
 
 	public Color[] colorpreset = { Blue, Yellow, Red, Green, Orange, Turquoise, Pink, White, Black };
 
@@ -43,7 +43,7 @@ public class BotdiffMain {
 	 * @param y
 	 * @param color
 	 */
-	public void setMyColorArray(int x, int y, Color color) {
+	private void setMyColorArray(int x, int y, Color color) {
 		colors[x][y][0] = color.getRed();
 		colors[x][y][1] = color.getGreen();
 		colors[x][y][2] = color.getBlue();
@@ -55,7 +55,7 @@ public class BotdiffMain {
 	 * @param color
 	 * @return true wenn color im Array colors auf x,y abgebildet ist
 	 */
-	public boolean isColor(int x, int y, Color color) {
+	private boolean isColor(int x, int y, Color color) {
 
 		if (x < 0 || x > 19 || y < 0 || y > 19)
 			return false;
@@ -67,7 +67,7 @@ public class BotdiffMain {
 		return false;
 	}
 
-	public boolean isstaticColor(int x, int y) {
+	private boolean isstaticColor(int x, int y) {
 
 		if (x < 0 || x > 19 || y < 0 || y > 19)
 			return false;
@@ -79,14 +79,14 @@ public class BotdiffMain {
 		return false;
 	}
 
-	public Color getColor(int x, int y) {
+	private Color getColor(int x, int y) {
 		return new Color(null, colors[x][y][0], colors[x][y][1], colors[x][y][2]);
 	}
 
 	/**
 	 * Startet das Spiel kann auch zum Neustarten verwendet werden
 	 */
-	public void start() {
+	private void start() {
 
 		// set default values
 		c.resetColors();
@@ -113,7 +113,7 @@ public class BotdiffMain {
 	/**
 	 * Menü mit Restart option
 	 */
-	public void endGame() {
+	private void endGame() {
 		if (!lost) {
 			int s = JOptionPane.showConfirmDialog(null, "Lines Cleared " + rowsCleared + "\n Restart?",
 					"Du hast verloren!", JOptionPane.YES_NO_OPTION);
@@ -131,7 +131,7 @@ public class BotdiffMain {
 	/**
 	 * Setzt die Next Pieces
 	 */
-	public void displaynextPieces() {
+	private void displaynextPieces() {
 		nextPiece1.setx(17);
 		nextPiece1.sety(3);
 		colors = nextPiece1.createPattern(colors, nextPiece1.getColor());
@@ -156,7 +156,7 @@ public class BotdiffMain {
 	 * Setzt die coords von den Nächsten und dem Hold Piece auf Schwarz ohne das
 	 * Array colors danach dem Board zu übergeben
 	 */
-	public void clearnextdisplay() {
+	private void clearnextdisplay() {
 
 		colors = nextPiece1.createPattern(colors, Black);
 
@@ -173,7 +173,7 @@ public class BotdiffMain {
 	 * Setzt das Piece an welches wir anhalten wollen in den Speicher und holt
 	 * gegebenenfalls das vorherige heraus.
 	 */
-	public void setholding() {
+	private void setholding() {
 		if (heldPiece == null) {
 			heldPiece = currentPiece;
 			currentPiece = null;
@@ -194,7 +194,7 @@ public class BotdiffMain {
 	/**
 	 * Hardcode für den SpielRahmen
 	 */
-	public void generateBorder() {
+	private void generateBorder() {
 		colors = c.getColors();
 
 		for (int i = 0; i < 20; i++) {
@@ -214,7 +214,7 @@ public class BotdiffMain {
 	 * 
 	 * @return
 	 */
-	public TetrisPiece generiereStein() {
+	private TetrisPiece generiereStein() {
 		return new TetrisPiece(getRandomNumber(1, 8));
 	}
 
@@ -225,7 +225,7 @@ public class BotdiffMain {
 	 * @param max
 	 * @return zufällige Nummer
 	 */
-	public int getRandomNumber(int min, int max) {
+	private int getRandomNumber(int min, int max) {
 		return (int) ((Math.random() * (max - min)) + min);
 	}
 
@@ -233,7 +233,7 @@ public class BotdiffMain {
 	 * Sendet das atuelle Piece auf seine Reise in den Abgrund.Seitdem c.sleep im
 	 * Code steht wird das Board manchmal für einen Frame Weiß.
 	 */
-	public void spawnTetrisStein() {
+	private void spawnTetrisStein() {
 		hold = 1; // wir dürfen nur einmal pro Stein swappen dehalb der counter
 
 		// set default values
@@ -265,8 +265,8 @@ public class BotdiffMain {
 
 			}
 			// setzt Piece an neuer pos mit gegebenenfalls neuer Rotation
-			colors = currentPiece.createPattern(colors, currentPiece.getColor());
 			showpreview();
+			colors = currentPiece.createPattern(colors, currentPiece.getColor());
 			c.setColors(colors);
 			c.updateBoard();
 		}
@@ -284,7 +284,7 @@ public class BotdiffMain {
 	/**
 	 * erstellt ein preview wo das aktuelle Piece currentPiece gerade hinfällt
 	 */
-	public void showpreview() {
+	private void showpreview() {
 		if (previewPiece == null) {
 			previewPiece = new TetrisPiece(0);
 			return;
@@ -300,20 +300,17 @@ public class BotdiffMain {
 			previewPiece.addy(1);
 		}
 
-		previewPiece.createPattern(colors, currentPiece.getColor().getweakColor());
-
+		colors=previewPiece.createPattern(colors, currentPiece.getColor().getweakColor());
 	}
 
 	/**
-	 * Die Methode durchsucht die position von Piece nach weißen Pixeln down-unter
-	 * dem Piece left-links neben dem Piece rigth-rechts neben dem Piece inner-die
-	 * exakte position den piece
+	 * Die Methode prüft ob ein Piece mit anderen schon gesetzten Steinen oder der Border kollidieren würde.
 	 * 
-	 * @param aktion
+	 * @param action (down, left, right, inner)
 	 * @param Piece
 	 * @return true wenn die gewählte Aktion zu einer kollision führt
 	 */
-	public boolean willcollide(String action, TetrisPiece Piece) {
+	private boolean willcollide(String action, TetrisPiece Piece) {
 		for (int i = 0; i < Piece.getform().length; i++) {
 
 			if (Piece.gety() - i + 1 == -1) // falls das Piece nur teilweise zu sehen ist
@@ -359,12 +356,12 @@ public class BotdiffMain {
 	}
 
 	/**
-	 * Erstellt ein Array mit allen Zeilen die voll sind. Wenn Zeile i voll ist dann
+	 * Erstellt ein Array das angibt welceh zeilen "komplett" sind. Wenn Zeile i voll ist dann
 	 * rowclear[i]==true. Danch geht die Methode die Zeilen von Unten nach Oben
 	 * durch und zieht, wenn eine Zeile gelöscht wird, die darüberliegenden
 	 * herunter.
 	 */
-	public void CheckAndConcatRows() {
+	private void CheckAndConcatRows() {
 
 		// erstelle rowclear[]
 		boolean[] rowclear = new boolean[19];
@@ -395,11 +392,7 @@ public class BotdiffMain {
 			}
 
 			for (int j = 1; j < 12; j++) {
-				if (isColor(j, i, Black)) {
-					setMyColorArray(j, i + offset, Black);
-				} else {
-					setMyColorArray(j, i + offset, getColor(j, i + offset));
-				}
+					setMyColorArray(j, i + offset, getColor(j, i));
 			}
 		}
 	}
@@ -410,13 +403,15 @@ public class BotdiffMain {
 	 * to be meaningful only for KEY_TYPED events." Trotzdem kreigt man nur doppelte
 	 * inputs wenn man den Buffer ausliest. Deshalb i+=2. Jedoch heißt das auch im
 	 * Endeffekt das nur KEY_PRESSED und KEY_RELEASED sich im buffer befinden wie
-	 * könneten es sonst nur 2 sein.
+	 * könneten es sonst nur 2 sein. Das Timing ist auch exakt zum Keypress oder realease. 
+	 * ???
 	 * 
-	 * Ich bin verwirrt aber die Methode funtioniert so am besten. Hours wasted: 1.5
+	 * Ich bin verwirrt aber die Methode funtioniert so am besten. Hours wasted: 2.5
 	 * 
 	 * @param buffer
 	 */
-	public void keypressManager(KeyBuffer buffer) {
+	
+	private void keypressManager(KeyBuffer buffer) {
 
 		KeyEvent[] event = buffer.popAll();
 
@@ -425,7 +420,7 @@ public class BotdiffMain {
 		}
 	}
 
-	public void keypress(KeyEvent event) {
+	private void keypress(KeyEvent event) {
 		switch (event.getKeyChar()) {
 		case 'q': // rotate left
 			counter1++;
